@@ -3,17 +3,18 @@ from tensorflow.keras import layers
 from ops import SNConv2D, SNDense, SelfAttention
 
 
-NOISE_DIM = 128
 G_CONV_DIM = 64
+# BN_MOMENTUM = 0.9
+BN_MOMENTUM = 0.9999
+BN_EPSILON = 1e-05
 
 
 class BatchNorm(layers.Layer):
     def __init__(self, **kwargs):
         super(BatchNorm, self).__init__(**kwargs)
-        
     
     def build(self, input_shape):
-        self.bn = layers.BatchNormalization(momentum=0.9, epsilon=1e-05, name='batch_normalization')
+        self.bn = layers.BatchNormalization(momentum=BN_MOMENTUM, epsilon=BN_EPSILON, name='batch_normalization')
         super(BatchNorm, self).build(input_shape)
         
     def call(self, inputs, training=None):
@@ -55,8 +56,8 @@ class UpResBlock(layers.Layer):
         return x + x0
     
     
-def make_generator_model():
-    input_layer = layers.Input(shape=(1, 1, NOISE_DIM), name='gen_input') # (None, 1, 1, NOISE_DIM)
+def make_generator_model(noise_dim):
+    input_layer = layers.Input(shape=(1, 1, noise_dim), name='gen_input') # (None, 1, 1, NOISE_DIM)
     x = SNDense(4*4*(G_CONV_DIM*16), name='gen_first_fc')(input_layer) # (None, 1, 1, 4*4*G_CONV_DIM*16)
     x = layers.Reshape((4, 4, G_CONV_DIM*16))(x) # (None, 4, 4, G_CONV_DIM*16)
 

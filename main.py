@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import time
 from glob import glob
 
-from generator import make_generator_model, NOISE_DIM
+from generator import make_generator_model
 from discriminator import make_discriminator_model
 from ops import TrainArg
 
@@ -21,9 +21,19 @@ N_SAMPLES = len(glob(IMG_PATH_PATTERN))
 BUFFER_SIZE = 5000
 BATCH_SIZE = 50
 
+NOISE_DIM = 128
 NUM_EXAMPLES_TO_GENERATE = 25
 SAMPLE_DIR = os.path.join('samples', 'celebA')
 SEED = tf.random.normal(shape=(NUM_EXAMPLES_TO_GENERATE, 1, 1, NOISE_DIM))
+
+# D_LEARNING_RATE = 4e-04
+# G_LEARNING_RATE = 1e-04
+D_LEARNING_RATE = 2e-04
+G_LEARNING_RATE = 5e-05
+BETA_1 = 0.0
+# BETA_2 = 0.9
+BETA_2 = 0.999
+ADAM_EPSILON = 1e-08
 
 START_ITER = 0
 END_ITER = 200000
@@ -53,11 +63,11 @@ image_ph = iterator.get_next()
 ##############################
 # Create models and optimizers
 ##############################
-generator = make_generator_model()
+generator = make_generator_model(NOISE_DIM)
 discriminator = make_discriminator_model()
 
-generator_optimizer = tf.keras.optimizers.Adam(0.0001, beta_1=0.0, beta_2=0.9, epsilon=1e-08)
-discriminator_optimizer = tf.keras.optimizers.Adam(0.0004, beta_1=0.0, beta_2=0.9, epsilon=1e-08)
+generator_optimizer = tf.keras.optimizers.Adam(G_LEARNING_RATE, beta_1=BETA_1, beta_2=BETA_2, epsilon=ADAM_EPSILON)
+discriminator_optimizer = tf.keras.optimizers.Adam(D_LEARNING_RATE, beta_1=BETA_1, beta_2=BETA_2, epsilon=ADAM_EPSILON)
 
 
 ##############################

@@ -3,7 +3,8 @@ from tensorflow.keras import layers
 from enum import Enum
 
 
-WEIGHT_INIT = tf.contrib.layers.xavier_initializer()
+# WEIGHT_INIT = tf.contrib.layers.xavier_initializer()
+WEIGHT_INIT = tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.02)
 BIAS_INIT = tf.zeros_initializer()
 
 
