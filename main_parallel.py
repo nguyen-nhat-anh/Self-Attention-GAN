@@ -30,7 +30,8 @@ GLOBAL_BATCH_SIZE = BATCH_SIZE_PER_REPLICA * strategy.num_replicas_in_sync
 NOISE_DIM = 128
 NUM_EXAMPLES_TO_GENERATE = 25
 SAMPLE_DIR = os.path.join('samples', 'celebA_parallel')
-SEED = tf.random.normal(shape=(NUM_EXAMPLES_TO_GENERATE, 1, 1, NOISE_DIM))
+# SEED = tf.random.normal(shape=(NUM_EXAMPLES_TO_GENERATE, 1, 1, NOISE_DIM))
+SEED = tf.random.truncated_normal(shape=(NUM_EXAMPLES_TO_GENERATE, 1, 1, NOISE_DIM), stddev=0.5)
 
 # D_LEARNING_RATE = 4e-04
 # G_LEARNING_RATE = 1e-04
@@ -103,7 +104,8 @@ with strategy.scope():
         inputs: "per-replica" values, such as those produced by a "distributed Dataset"
         '''
         with tf.GradientTape() as disc_tape, tf.GradientTape() as gen_tape: 
-            noise = tf.random.normal(shape=(BATCH_SIZE_PER_REPLICA, 1, 1, NOISE_DIM))
+#             noise = tf.random.normal(shape=(BATCH_SIZE_PER_REPLICA, 1, 1, NOISE_DIM))
+            noise = tf.random.truncated_normal(shape=(BATCH_SIZE_PER_REPLICA, 1, 1, NOISE_DIM), stddev=0.5)
             real_output = discriminator(inputs, training=TrainArg.TRUE_UPDATE_U)
             fake_output = discriminator(generator(noise, training=TrainArg.TRUE_UPDATE_U), training=TrainArg.TRUE_NO_UPDATE_U)
         
